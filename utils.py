@@ -46,8 +46,16 @@ def _parse_context(val) -> list[str] | None:
     raw = str(val)
     # 支持逗号或换行分隔
     parts = re.split(r"[,，\n]+", raw)
-    parts = [p.strip() for p in parts if p.strip()]
-    return parts if parts else None
+    cleaned = []
+    for p in parts:
+        p = p.strip()
+        # 去掉 [# 前缀和 ] 后缀（兼容 Excel 里的格式）
+        p = re.sub(r'^[\[#\s]+', '', p)
+        p = re.sub(r'[\]\s]+$', '', p)
+        p = p.strip()
+        if p:
+            cleaned.append(p)
+    return cleaned if cleaned else None
 
 
 def parse_dataframe(df: pd.DataFrame, default_voice_type: str) -> list[TTSTask]:
