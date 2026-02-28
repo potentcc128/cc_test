@@ -10,10 +10,16 @@ from batch_processor import TTSResult, TTSTask
 
 
 # 列名别名映射
-_TEXT_COLS = ["text", "文本", "内容", "文字", "句子", "query", "问题"]
-_VOICE_COLS = ["voice_type", "voice", "音色", "音色类型"]
-_CONTEXT_COLS = ["context_texts", "context", "语音指令", "指令"]
+_TEXT_COLS = ["#文本", "text", "文本", "内容", "文字", "句子", "query", "问题"]
+_VOICE_COLS = ["voice_type", "voice", "音色", "音色类型", "情感/状态类型"]
+_CONTEXT_COLS = ["#语音指令", "context_texts", "context", "语音指令", "指令"]
 _SECTION_COLS = ["section_id", "section", "会话ID", "分段ID"]
+
+
+def strip_action_text(text: str) -> str:
+    """去掉【】内的动作描述，只保留对白文本。"""
+    cleaned = re.sub(r'【[^】]*】', '', text)
+    return cleaned.strip()
 
 
 def safe_filename(text: str, index: int) -> str:
@@ -58,7 +64,7 @@ def parse_dataframe(df: pd.DataFrame, default_voice_type: str) -> list[TTSTask]:
 
     tasks = []
     for i, row in df.iterrows():
-        text = str(row[text_col]).strip()
+        text = strip_action_text(str(row[text_col]).strip())
         if not text or text.lower() == "nan":
             continue
 
