@@ -1,0 +1,11 @@
+[Unit]
+Description=TTS App
+After=network.target
+
+[Service]
+WorkingDirectory=/root/tts_app
+ExecStart=python3 -m streamlit run app.py --server.port 8501 --server.address 0.0.0.0 --server.headless true
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
